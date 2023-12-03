@@ -4,6 +4,7 @@ namespace Aoc2023;
 use Aoc2023\Main\Exercise;
 use Aoc2023\Ex01\Ex01;
 use Aoc2023\Ex02\Ex02;
+use Aoc2023\Ex03\Ex03;
 
 ini_set('log_errors', 1);
 ini_set('memory_limit', '8G');
@@ -14,5 +15,6 @@ error_reporting(-1);
 Exercise::setArgs($argv[1] ?? null);
 
 // $ex01 = new Ex01();
-$ex02 = new Ex02();
+// $ex02 = new Ex02();
+$ex03 = new Ex03();
 
