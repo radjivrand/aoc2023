@@ -13,11 +13,29 @@ class Ex05 extends Exercise
     public function __construct()
     {
         $this->parseInput($this->getFileContents());
+
         $this->run();
     }
 
     public function run()
     {
+        foreach ($this->maps as $key => $map) {
+            usort($map, function($a, $b) {
+                return $a[1] <=> $b[1];
+            });
+
+            foreach ($map as $value) {
+                print_r($value[0] . '  -  ' . $value[1] . '  -  ' . $value[2]);
+                print_r(PHP_EOL);
+            }
+
+
+            print_r(PHP_EOL);
+
+        }
+            print_r(PHP_EOL);
+
+
         // print_r($this->seeds);
 
         // part1
@@ -33,56 +51,26 @@ class Ex05 extends Exercise
         //     }
         // }
 
-        foreach ($this->seeds as $index => $seed) {
-            if ($index % 2 == 0) {
-                continue;
-            }
-            $start = $this->seeds[$index - 1];
-            $range = $seed;
-
-            // print_r('Pair ' . $index - 1 . ' and ' . $index . PHP_EOL);
-            // print_r('Length: ' . ($start + $range) . PHP_EOL);
-
-            for ($i=$start; $i < $start + $range; $i++) { 
-                $res = $i;
-                if ($i % 100000 == 0) {
-                    print_r('Seeds: ' . $i . PHP_EOL);
-
-                }
-
-                foreach ($this->maps as $key => $map) {
-                    $res = $this->getNext($res, $map, $key);
-                }
-
-
-                // print_r($res . PHP_EOL);
-                if ($res < $this->min) {
-                    $this->min = $res;
-                }
-            }
-        }
-
-        print_r($this->min);
     }
 
-    public function getNext($inputValue, $map, $key)
-    {
-        foreach ($map as $row) {
-            if ($this->isInRange($inputValue, $row[1], $row[2])) {
-                $diff = $inputValue - $row[1];
-                return $row[0] + $diff;
-            } else {
-                $output = $inputValue;
-            }
-        }
+    // public function getNext($inputValue, $map, $key)
+    // {
+    //     foreach ($map as $row) {
+    //         if ($this->isInRange($inputValue, $row[1], $row[2])) {
+    //             $diff = $inputValue - $row[1];
+    //             return $row[0] + $diff;
+    //         } else {
+    //             $output = $inputValue;
+    //         }
+    //     }
 
-        return $output;
-    }
+    //     return $output;
+    // }
 
-    public function isInRange($number, $start, $range)
-    {
-        return $start <= $number && $number <= $start + $range;
-    }
+    // public function isInRange($number, $start, $range)
+    // {
+    //     return $start <= $number && $number <= $start + $range;
+    // }
 
     public function parseInput($arr)
     {

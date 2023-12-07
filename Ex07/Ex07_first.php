@@ -6,24 +6,21 @@ use Aoc2023\Main\Exercise;
 
 class Ex07 extends Exercise
 {
-    // 250888060 too high
-    // 250665248 just right
-
     protected $hands;
     protected $order = [
         'A' => 12,
         'K' => 11,
         'Q' => 10,
-        'T' => 9,
-        '9' => 8,
-        '8' => 7,
-        '7' => 6,
-        '6' => 5,
-        '5' => 4,
-        '4' => 3,
-        '3' => 2,
-        '2' => 1,
-        'J' => 0,
+        'J' => 9,
+        'T' => 8,
+        '9' => 7,
+        '8' => 6,
+        '7' => 5,
+        '6' => 4,
+        '5' => 3,
+        '4' => 2,
+        '3' => 1,
+        '2' => 0,
     ];
 
     public function __construct()
@@ -72,20 +69,6 @@ class Ex07 extends Exercise
         return 0;
     }
 
-    public function getHighestRank($arr)
-    {
-        $score = 0;
-
-        foreach ($arr as $key => $char) {
-            if ($this->order[$char] > $score) {
-                $score = $this->order[$char];
-                $highest = $char;
-            }
-        }
-
-        return $highest;
-    }
-
     public function getHandScore(string $hand)
     {
         $arr = [];
@@ -96,37 +79,6 @@ class Ex07 extends Exercise
             $arr[$char] += 1;
         }
 
-        $chars = array_keys($arr);
-
-        if (in_array('J', $chars)) {
-            $jokers = $arr['J'];
-            unset($arr['J']);
-
-            if (empty($arr)) {
-                return 100;
-            }
-
-            arsort($arr);
-
-            if (in_array(3, $arr)) {
-                $arr[array_flip($arr)[3]] += $jokers;
-            }
-
-            if (array_values($arr)[0] == 2) {
-                if (isset(array_values($arr)[1]) && array_values($arr)[1] == 2) {
-                    $highestChar = $this->getHighestRank([array_keys($arr)[0], array_keys($arr)[1]]);
-                    $arr[$highestChar] += $jokers;
-                } else {
-                    $arr[array_keys($arr)[0]] += $jokers;
-                }
-            }
-
-            if (array_values($arr)[0] == 1) {
-                $highest = $this->getHighestRank(array_keys($arr));
-                $arr[$highest] += $jokers;
-            }
-        }
-    
         switch (count($arr)) {
             case 1:
                 return 100;
