@@ -19,25 +19,6 @@ class Ex05 extends Exercise
 
     public function run()
     {
-        foreach ($this->maps as $key => $map) {
-            usort($map, function($a, $b) {
-                return $a[1] <=> $b[1];
-            });
-
-            foreach ($map as $value) {
-                print_r($value[0] . '  -  ' . $value[1] . '  -  ' . $value[2]);
-                print_r(PHP_EOL);
-            }
-
-
-            print_r(PHP_EOL);
-
-        }
-            print_r(PHP_EOL);
-
-
-        // print_r($this->seeds);
-
         // part1
         // foreach ($this->seeds as $seed) {
         //     $res = $seed;
@@ -51,26 +32,74 @@ class Ex05 extends Exercise
         //     }
         // }
 
+        // part 2
+        $map = $this->maps['fertilizer-to-water'];
+
+        // map - interval - seed??
+        // print_r($this->seeds);
+
+        $newSeeds = [];
+
+        foreach ($this->maps as $label => $map) {
+            foreach ($map as $slice) {
+                foreach ($this->seeds as $seed) {
+                    if ($this->areTouching($slice, $seed)) {
+                        print_r($seed);
+                        print_r($slice);
+
+                        $new = $this->split($slice, $seed);
+
+                        print_r($new);
+                        print_r(PHP_EOL);
+                        print_r(PHP_EOL);
+                        print_r(PHP_EOL);
+                    }
+                }
+            }
+        }
     }
 
-    // public function getNext($inputValue, $map, $key)
-    // {
-    //     foreach ($map as $row) {
-    //         if ($this->isInRange($inputValue, $row[1], $row[2])) {
-    //             $diff = $inputValue - $row[1];
-    //             return $row[0] + $diff;
-    //         } else {
-    //             $output = $inputValue;
-    //         }
-    //     }
+    public function split($slice, $seed)
+    {
+        // a-----slice-------b
+        //       x----seed---|--y
 
-    //     return $output;
-    // }
 
-    // public function isInRange($number, $start, $range)
-    // {
-    //     return $start <= $number && $number <= $start + $range;
-    // }
+        //       a--slice-------b
+        // x-----|---seed---y
+
+
+        // a-------slice---------b
+        //    x--seed---y
+
+
+        //    a--slice---b
+        // x--|---seed---|-------y
+
+        $sliceStart = $slice[1];
+        $sliceEnd = $slice[1] + $slice[2];
+        $seedStart = $seed['sta'];
+        $seedEnd = $seed['end'];
+
+        if ($sliceStart < $seedStart && $sliceEnd > $seedStart && $sliceEnd < $seedEnd) {
+            return [['sta' => $seedStart, 'end' => $sliceEnd], ['sta' => $sliceEnd + 1, 'end' => $seedEnd]];
+        } elseif ($sliceStart < $seedEnd && $sliceEnd > $seedEnd && $sliceStart > $seedStart) {
+            return [['sta' => $seedStart, 'end' => $sliceStart], ['sta' => $sliceStart + 1, 'end' => $seedEnd]];
+        } elseif ($sliceStart < $seedStart && $sliceEnd > $seedEnd) {
+            return $seed;
+        } elseif ($sliceStart > $seedStart && $sliceEnd < $seedEnd) {
+            return [
+                ['sta' => $seedStart, 'end' => $sliceStart - 1],
+                ['sta' => $sliceStart, 'end' => $sliceEnd1],
+                ['sta' => $sliceEnd + 1, 'end' => $seedEnd],
+            ];
+        }
+    }
+
+    public function areTouching($slice, $seed)
+    {
+        return !($seed['sta'] > $slice[1] + $slice[2] || $seed['end'] < $slice[1]);
+    }
 
     public function parseInput($arr)
     {
@@ -88,5 +117,23 @@ class Ex05 extends Exercise
                 $this->maps[$label][] = $exploded;
             }
         }
+
+        foreach ($this->maps as $key => &$map) {
+            usort($map, function($a, $b) {
+                return $a[1] <=> $b[1];
+            });
+        }
+
+        $seedArr = [];
+        foreach ($this->seeds as $key => &$seed) {
+            if ($key % 2 == 1) {
+                $seedArr[] = [
+                    'sta' => $this->seeds[$key - 1],
+                    'end' => $this->seeds[$key - 1] + $seed
+                ];
+            }
+        }
+
+        $this->seeds = $seedArr;
     }
 }
