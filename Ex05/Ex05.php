@@ -33,72 +33,105 @@ class Ex05 extends Exercise
         // }
 
         // part 2
-        $map = $this->maps['fertilizer-to-water'];
+        $map = $this->maps['light-to-temperature'];
+        $seeds = $this->seeds;
 
-        // map - interval - seed??
-        // print_r($this->seeds);
+        print_r($this->maps);
+        die();
+        // print_r($seeds);
 
-        $newSeeds = [];
+        // foreach ($this->maps as $key => $map) {
+            // print_r($key . PHP_EOL);
+            $newSeeds = [];
+            foreach ($seeds as $seed) {
+                $isTouching = false;
 
-        foreach ($this->maps as $label => $map) {
-            foreach ($map as $slice) {
-                foreach ($this->seeds as $seed) {
-                    if ($this->areTouching($slice, $seed)) {
-                        print_r($seed);
-                        print_r($slice);
+                foreach ($map as $interval) {
+                    if ($this->isTouching($interval, $seed)) {
+                        $isTouching = true;
 
-                        $new = $this->split($slice, $seed);
+                        $res = $this->splitter($interval, $seed);
 
-                        print_r($new);
-                        print_r(PHP_EOL);
-                        print_r(PHP_EOL);
-                        print_r(PHP_EOL);
+                        print_r($res);
+                        if (isset($res[0])) {
+                            $newSeeds = array_merge($newSeeds, $res);
+                        } else {
+                            $newSeeds[] = $res; 
+                        }
                     }
                 }
+
+                if (!$isTouching) {
+                    $newSeeds[] = $seed;
+                }
             }
-        }
+
+            foreach ($newSeeds as &$newSeed) {
+                foreach ($map as $interval) {
+                    if ($this->isTouching($interval, $newSeed)) {
+                        foreach ($newSeed as $key => &$value) {
+                            $value += $interval['move'];
+                        }
+                    }                
+                }
+            }
+
+            $seeds = $newSeeds;
+            print_r($newSeeds);
+        // }
+
     }
 
-    public function split($slice, $seed)
+    public function isTouching($interval, $seed)
     {
-        // a-----slice-------b
-        //       x----seed---|--y
+        // if (!isset($seed['sta'])) {
+        //     print_r(debug_backtrace()[0]['line'] );
+        //     var_dump($seed);
+        //     print_r("dalkfadlfajklfdasjklf" . PHP_EOL);            
+        // }
 
+        $a = $interval['from'] <= $seed['sta'] && $interval['to'] >= $seed['sta'];
+        $b = $seed['sta'] <= $interval['from'] && $seed['end'] >= $interval['from'];
+        return $a || $b;
+    }
 
-        //       a--slice-------b
-        // x-----|---seed---y
-
-
-        // a-------slice---------b
-        //    x--seed---y
-
-
-        //    a--slice---b
-        // x--|---seed---|-------y
-
-        $sliceStart = $slice[1];
-        $sliceEnd = $slice[1] + $slice[2];
+    public function splitter($interval, $seed)
+    {
+        $sliceStart = $interval['from'];
+        $sliceEnd = $interval['to'];
         $seedStart = $seed['sta'];
         $seedEnd = $seed['end'];
 
         if ($sliceStart < $seedStart && $sliceEnd > $seedStart && $sliceEnd < $seedEnd) {
-            return [['sta' => $seedStart, 'end' => $sliceEnd], ['sta' => $sliceEnd + 1, 'end' => $seedEnd]];
+            return [
+                ['sta' => $seedStart, 'end' => $sliceEnd],
+                ['sta' => $sliceEnd + 1, 'end' => $seedEnd]
+            ];
         } elseif ($sliceStart < $seedEnd && $sliceEnd > $seedEnd && $sliceStart > $seedStart) {
-            return [['sta' => $seedStart, 'end' => $sliceStart], ['sta' => $sliceStart + 1, 'end' => $seedEnd]];
-        } elseif ($sliceStart < $seedStart && $sliceEnd > $seedEnd) {
+            print_r('if 2' . PHP_EOL);
+            print_r($seed);
+            print_r($interval);
+
+            return [
+                ['sta' => $seedStart, 'end' => $sliceStart],
+                ['sta' => $sliceStart + 1, 'end' => $seedEnd]
+            ];
+        } elseif ($sliceStart <= $seedStart && $sliceEnd >= $seedEnd) {
+            print_r('if 3' . PHP_EOL);
             return $seed;
         } elseif ($sliceStart > $seedStart && $sliceEnd < $seedEnd) {
+            print_r('ever here?');
             return [
                 ['sta' => $seedStart, 'end' => $sliceStart - 1],
-                ['sta' => $sliceStart, 'end' => $sliceEnd1],
+                ['sta' => $sliceStart, 'end' => $sliceEnd],
                 ['sta' => $sliceEnd + 1, 'end' => $seedEnd],
             ];
         }
-    }
 
-    public function areTouching($slice, $seed)
-    {
-        return !($seed['sta'] > $slice[1] + $slice[2] || $seed['end'] < $slice[1]);
+        print_r($interval);
+        print_r($seed);
+
+        print_r("noresult really?" . PHP_EOL);
     }
 
     public function parseInput($arr)
@@ -114,13 +147,17 @@ class Ex05 extends Exercise
             if (!is_numeric($exploded[0])) {
                 $label = $exploded[0];
             } else {
-                $this->maps[$label][] = $exploded;
+                $this->maps[$label][] = [
+                    'from' => $exploded[1],
+                    'to' => $exploded[1] + $exploded[2] - 1,
+                    'move' => $exploded[0] - $exploded[1],
+                ];
             }
         }
 
         foreach ($this->maps as $key => &$map) {
             usort($map, function($a, $b) {
-                return $a[1] <=> $b[1];
+                return $a['from'] <=> $b['from'];
             });
         }
 
@@ -129,7 +166,7 @@ class Ex05 extends Exercise
             if ($key % 2 == 1) {
                 $seedArr[] = [
                     'sta' => $this->seeds[$key - 1],
-                    'end' => $this->seeds[$key - 1] + $seed
+                    'end' => $this->seeds[$key - 1] + $seed - 1
                 ];
             }
         }
@@ -137,3 +174,20 @@ class Ex05 extends Exercise
         $this->seeds = $seedArr;
     }
 }
+
+
+        // a-----slice-------b
+        //       x----seed---|--y
+
+
+        //       a--slice-------b
+        // x-----|---seed---y
+
+
+        // a-------slice---------b
+        //    x--seed---y
+
+
+        //    a--slice---b
+        // x--|---seed---|-------y
+
