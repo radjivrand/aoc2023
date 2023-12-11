@@ -13,125 +13,75 @@ class Ex05 extends Exercise
     public function __construct()
     {
         $this->parseInput($this->getFileContents());
-
         $this->run();
     }
 
     public function run()
     {
+        // print_r($this->seeds);
+
         // part1
-        // foreach ($this->seeds as $seed) {
-        //     $res = $seed;
+        foreach ($this->seeds as $seed) {
+            $res = $seed;
 
-        //     foreach ($this->maps as $key => $map) {
-        //         $res = $this->getNext($res, $map, $key);
-        //     }
-
-        //     if ($res < $this->min) {
-        //         $this->min = $res;
-        //     }
-        // }
-
-        // part 2
-        $map = $this->maps['light-to-temperature'];
-        $seeds = $this->seeds;
-
-        print_r($this->maps);
-        die();
-        // print_r($seeds);
-
-        // foreach ($this->maps as $key => $map) {
-            // print_r($key . PHP_EOL);
-            $newSeeds = [];
-            foreach ($seeds as $seed) {
-                $isTouching = false;
-
-                foreach ($map as $interval) {
-                    if ($this->isTouching($interval, $seed)) {
-                        $isTouching = true;
-
-                        $res = $this->splitter($interval, $seed);
-
-                        print_r($res);
-                        if (isset($res[0])) {
-                            $newSeeds = array_merge($newSeeds, $res);
-                        } else {
-                            $newSeeds[] = $res; 
-                        }
-                    }
-                }
-
-                if (!$isTouching) {
-                    $newSeeds[] = $seed;
-                }
+            foreach ($this->maps as $key => $map) {
+                $res = $this->getNext($res, $map, $key);
             }
 
-            foreach ($newSeeds as &$newSeed) {
-                foreach ($map as $interval) {
-                    if ($this->isTouching($interval, $newSeed)) {
-                        foreach ($newSeed as $key => &$value) {
-                            $value += $interval['move'];
-                        }
-                    }                
-                }
+            if ($res < $this->min) {
+                $this->min = $res;
             }
-
-            $seeds = $newSeeds;
-            print_r($newSeeds);
-        // }
-
-    }
-
-    public function isTouching($interval, $seed)
-    {
-        // if (!isset($seed['sta'])) {
-        //     print_r(debug_backtrace()[0]['line'] );
-        //     var_dump($seed);
-        //     print_r("dalkfadlfajklfdasjklf" . PHP_EOL);            
-        // }
-
-        $a = $interval['from'] <= $seed['sta'] && $interval['to'] >= $seed['sta'];
-        $b = $seed['sta'] <= $interval['from'] && $seed['end'] >= $interval['from'];
-        return $a || $b;
-    }
-
-    public function splitter($interval, $seed)
-    {
-        $sliceStart = $interval['from'];
-        $sliceEnd = $interval['to'];
-        $seedStart = $seed['sta'];
-        $seedEnd = $seed['end'];
-
-        if ($sliceStart < $seedStart && $sliceEnd > $seedStart && $sliceEnd < $seedEnd) {
-            return [
-                ['sta' => $seedStart, 'end' => $sliceEnd],
-                ['sta' => $sliceEnd + 1, 'end' => $seedEnd]
-            ];
-        } elseif ($sliceStart < $seedEnd && $sliceEnd > $seedEnd && $sliceStart > $seedStart) {
-            print_r('if 2' . PHP_EOL);
-            print_r($seed);
-            print_r($interval);
-
-            return [
-                ['sta' => $seedStart, 'end' => $sliceStart],
-                ['sta' => $sliceStart + 1, 'end' => $seedEnd]
-            ];
-        } elseif ($sliceStart <= $seedStart && $sliceEnd >= $seedEnd) {
-            print_r('if 3' . PHP_EOL);
-            return $seed;
-        } elseif ($sliceStart > $seedStart && $sliceEnd < $seedEnd) {
-            print_r('ever here?');
-            return [
-                ['sta' => $seedStart, 'end' => $sliceStart - 1],
-                ['sta' => $sliceStart, 'end' => $sliceEnd],
-                ['sta' => $sliceEnd + 1, 'end' => $seedEnd],
-            ];
         }
 
-        print_r($interval);
-        print_r($seed);
+        // foreach ($this->seeds as $index => $seed) {
+        //     if ($index % 2 == 0) {
+        //         continue;
+        //     }
+        //     $start = $this->seeds[$index - 1];
+        //     $range = $seed;
 
-        print_r("noresult really?" . PHP_EOL);
+        //     // print_r('Pair ' . $index - 1 . ' and ' . $index . PHP_EOL);
+        //     // print_r('Length: ' . ($start + $range) . PHP_EOL);
+
+        //     for ($i=$start; $i < $start + $range; $i++) { 
+        //         $res = $i;
+        //         if ($i % 100000 == 0) {
+        //             print_r('Seeds: ' . $i . PHP_EOL);
+
+        //         }
+
+        //         foreach ($this->maps as $key => $map) {
+        //             $res = $this->getNext($res, $map, $key);
+        //         }
+
+
+        //         // print_r($res . PHP_EOL);
+        //         if ($res < $this->min) {
+        //             $this->min = $res;
+        //         }
+        //     }
+        // }
+
+        print_r($this->min);
+    }
+
+    public function getNext($inputValue, $map, $key)
+    {
+        foreach ($map as $row) {
+            if ($this->isInRange($inputValue, $row[1], $row[2])) {
+                $diff = $inputValue - $row[1];
+                return $row[0] + $diff;
+            } else {
+                $output = $inputValue;
+            }
+        }
+
+        return $output;
+    }
+
+    public function isInRange($number, $start, $range)
+    {
+        return $start <= $number && $number <= $start + $range;
     }
 
     public function parseInput($arr)
@@ -147,47 +97,8 @@ class Ex05 extends Exercise
             if (!is_numeric($exploded[0])) {
                 $label = $exploded[0];
             } else {
-                $this->maps[$label][] = [
-                    'from' => $exploded[1],
-                    'to' => $exploded[1] + $exploded[2] - 1,
-                    'move' => $exploded[0] - $exploded[1],
-                ];
+                $this->maps[$label][] = $exploded;
             }
         }
-
-        foreach ($this->maps as $key => &$map) {
-            usort($map, function($a, $b) {
-                return $a['from'] <=> $b['from'];
-            });
-        }
-
-        $seedArr = [];
-        foreach ($this->seeds as $key => &$seed) {
-            if ($key % 2 == 1) {
-                $seedArr[] = [
-                    'sta' => $this->seeds[$key - 1],
-                    'end' => $this->seeds[$key - 1] + $seed - 1
-                ];
-            }
-        }
-
-        $this->seeds = $seedArr;
     }
 }
-
-
-        // a-----slice-------b
-        //       x----seed---|--y
-
-
-        //       a--slice-------b
-        // x-----|---seed---y
-
-
-        // a-------slice---------b
-        //    x--seed---y
-
-
-        //    a--slice---b
-        // x--|---seed---|-------y
-
