@@ -18,51 +18,26 @@ class Ex05 extends Exercise
 
     public function run()
     {
-        // print_r($this->seeds);
-
         // part1
-        foreach ($this->seeds as $seed) {
-            $res = $seed;
+        // foreach ($this->seeds as $seed) {
+        //     $res = $seed;
 
-            foreach ($this->maps as $key => $map) {
-                $res = $this->getNext($res, $map, $key);
-            }
-
-            if ($res < $this->min) {
-                $this->min = $res;
-            }
-        }
-
-        // foreach ($this->seeds as $index => $seed) {
-        //     if ($index % 2 == 0) {
-        //         continue;
+        //     foreach ($this->maps as $key => $map) {
+        //         $res = $this->getNext($res, $map, $key);
         //     }
-        //     $start = $this->seeds[$index - 1];
-        //     $range = $seed;
 
-        //     // print_r('Pair ' . $index - 1 . ' and ' . $index . PHP_EOL);
-        //     // print_r('Length: ' . ($start + $range) . PHP_EOL);
-
-        //     for ($i=$start; $i < $start + $range; $i++) { 
-        //         $res = $i;
-        //         if ($i % 100000 == 0) {
-        //             print_r('Seeds: ' . $i . PHP_EOL);
-
-        //         }
-
-        //         foreach ($this->maps as $key => $map) {
-        //             $res = $this->getNext($res, $map, $key);
-        //         }
-
-
-        //         // print_r($res . PHP_EOL);
-        //         if ($res < $this->min) {
-        //             $this->min = $res;
-        //         }
+        //     if ($res < $this->min) {
+        //         $this->min = $res;
         //     }
         // }
 
-        print_r($this->min);
+        print_r($this->maps);
+        $initial = [0, 0, 100];
+
+
+
+
+
     }
 
     public function getNext($inputValue, $map, $key)
@@ -99,6 +74,12 @@ class Ex05 extends Exercise
             } else {
                 $this->maps[$label][] = $exploded;
             }
+        }
+
+        foreach ($this->maps as &$map) {
+            usort($map, function($a, $b) {
+                return $a[1] <=> $b[1];
+            });
         }
     }
 }
