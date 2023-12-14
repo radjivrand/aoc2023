@@ -12,18 +12,16 @@ class Ex12 extends Exercise
     {
         $this->parseInput($this->getFileContents());
         $this->run();
+
     }
+
 
     public function run()
     {
-        print_r(PHP_EOL);
-        // print_r($this->lines);
+        $res = 0;
 
-        // foreach ($this->lines as $ln) {
-            // print_r($this->getCurrentPcs($line['line']));
-            // print_r($line['pcs']);
-            $ln = $this->lines[0];
-
+        foreach ($this->lines as $ln) {
+        // $ln = $this->lines[5];
             $pieces = $ln['pcs'];
             $line = $ln['line'];
 
@@ -36,13 +34,48 @@ class Ex12 extends Exercise
                 '.' => $reqDots - $data['.']
             ];
 
+            $options = $this->getOptions($bag['#'], $data['?']);
 
-            $a = 10 >> 2;
+            $splitLine = str_split($line);
 
-            print_r($a);
-            print_r($this->meth(4,2));
+            foreach ($options as $opt) {
+                $counter = 0;
+                $str = '';
+                foreach ($splitLine as $char) {
+                    if ($char == '?') {
+                        $str .= (int)$opt[$counter] ? '#' : '.';
+                        $counter++;
+                    } else {
+                        $str .= $char;
+                    }
+                }
 
 
+                if ($this->isValid($str, $line) && $this->getCurrentPcs($str) == $pieces) {
+                    $res++;
+                }
+            }
+        }
+
+        print_r($res);
+    }
+
+    public function getOptions($hashtags, $room)
+    {
+        $res = [];
+
+        for ($i=0; $i < 2 ** $room; $i++) { 
+            $str = str_pad(decbin($i), $room, '0', STR_PAD_LEFT);
+
+            $arr = str_split($str);
+            if (array_sum($arr) != $hashtags) {
+                continue;
+            }
+
+            $res[] = $arr;
+        }
+
+        return $res;
     }
 
     public function getData($str)
@@ -84,7 +117,6 @@ class Ex12 extends Exercise
         return $arr;
     }
 
-
     public function isValid($str, $ref)
     {
         $ref = str_split($ref);
@@ -124,19 +156,8 @@ class Ex12 extends Exercise
         }
     }
 
-    public function getPerms($arr)
-    {
-        $start = $arr['line'];
-        $pcs = $arr['pcs'];
-
-        print_r($pcs);
-        print_r($start);
-
-    }
-
     public function parseInput($arr)
     {
-
         foreach ($arr as $row) {
             list($line, $pieces) = explode(' ', $row);
             $pieces = explode(',', $pieces);
