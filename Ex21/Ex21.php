@@ -1,10 +1,10 @@
 <?php
 
-namespace Aoc2023\Ex04;
+namespace Aoc2023\Ex21;
 
 use Aoc2023\Main\Exercise;
 
-class Ex04 extends Exercise
+class Ex21 extends Exercise
 {
     protected $map;
 
