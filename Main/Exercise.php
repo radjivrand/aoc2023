@@ -15,14 +15,16 @@ class Exercise
 
     public function getFileContents($ignoreNewlines = true)
     {
-        $ignore = $ignoreNewlines ? FILE_IGNORE_NEW_LINES : null; 
-
         $exploded = explode('\\', get_called_class());
         array_pop($exploded);
         array_splice($exploded, 1, 0, 'src');
         $filePath = self::FILE_PATH . implode('/', $exploded) . '/';
         $fileName = 'input' . (self::$arg ? '_' . self::$arg : '') .  '.txt';
 
-        return file($filePath . $fileName, $ignore);
+        if (!$ignoreNewlines) {
+            return file($filePath . $fileName);
+        }
+
+        return file($filePath . $fileName, FILE_IGNORE_NEW_LINES);
     }
 }
