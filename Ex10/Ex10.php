@@ -9,6 +9,7 @@ class Ex10 extends Exercise
     protected $map;
     protected $current;
     protected $visited;
+    protected $border;
 
     protected $ref = [
         '-' => [
@@ -40,10 +41,48 @@ class Ex10 extends Exercise
     public function __construct()
     {
         $this->parseInput($this->getFileContents());
-        $this->run();
+        // $this->runPartOne();
+        $this->runPartTwo();
     }
 
-    public function run()
+    public function runPartTwo()
+    {
+        // part2 
+        $new = $this->findNext();
+
+        print_r($new);
+
+        while (!empty($new)) {
+            $new = $this->findNext();
+        }
+
+
+        $b = array_filter($this->border, function($item) {
+            return !in_array($item, $this->visited);
+        });
+
+        print_r($b);
+
+
+        // print_r($this->visited);
+
+        foreach ($this->map as $row => $line) {
+            foreach ($line as $col => $value) {
+                if (in_array([$row, $col], $b)) {
+                    print_r('0');                   
+                } elseif (!in_array([$row, $col], $this->visited)) {
+                    print_r('#');
+                } else {
+                    print_r(' ');
+                }
+
+            }
+            print_r(PHP_EOL);
+
+        }
+    }
+
+    public function runPartOne()
     {
         $new = $this->findNext();
 
@@ -53,17 +92,6 @@ class Ex10 extends Exercise
 
         print_r((count($this->visited) + 1) / 2);
         print_r(PHP_EOL);
-
-
-        // part2 
-        foreach ($this->map as $row => $line) {
-            foreach ($line as $col => $value) {
-                print_r(!in_array([$row, $col], $this->visited) ? '#' : ' ');
-                # code...
-            }
-            print_r(PHP_EOL);
-
-        }
     }
 
     public function findNext()
@@ -92,6 +120,29 @@ class Ex10 extends Exercise
 
             if (in_array($this->map[$loc[0]][$loc[1]], $opts) && (empty($this->visited) || !in_array($loc, $this->visited))) {
                 $this->visited[] = $this->current;
+
+                if ($currentChar == '|') {
+                    $this->border[] = [
+                        $y,
+                        $x + 1
+                    ];
+                    $this->border[] = [
+                        $y,
+                        $x - 1
+                    ];
+                }
+
+                if ($currentChar == '-') {
+                    $this->border[] = [
+                        $y + 1,
+                        $x
+                    ];
+                    $this->border[] = [
+                        $y - 1,
+                        $x
+                    ];
+                }
+
                 $this->current = $loc;
                 return $loc;
             }
